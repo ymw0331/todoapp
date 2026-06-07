@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette import status
@@ -9,6 +9,8 @@ from passlib.context import CryptContext
 from database import SessionLocal
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import JWTError, jwt
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 
 router = APIRouter(
     prefix="/auth",
@@ -51,6 +53,17 @@ def get_db():
 
 # Depends: injects get_db() into each route so we don't manually manage the session
 db_dependency = Annotated[Session, Depends(get_db)]
+
+templates = Jinja2Templates(directory="templates")
+
+
+### Pages ###
+@router.get("/login-page")
+def render_login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+
+### Endpoints ###
 
 
 def authenticate_user(username: str, password: str, db):
