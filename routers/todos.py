@@ -1,12 +1,15 @@
 from typing import Annotated
+from urllib import request
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
-from fastapi import APIRouter, Depends, HTTPException, Path, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Path, Request, logger, status
 from models import Todos
 from database import SessionLocal
+from routers import user
 from routers.auth import get_current_user
 from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
+from loguru import logger
 
 
 templates = Jinja2Templates(directory="templates")
@@ -56,6 +59,24 @@ async def render_todo_page(request: Request, db: db_dependency):
         )
 
     except Exception as e:
+        return redirect_to_login()
+
+
+@router.get("/add-todo-page")
+async def render_add_todo_page(request: Request):
+    logger.info("Rendering add-todo page")
+    try:
+        user = await get_current_user(request.cookies.get("access_token"))
+        logger.info(f"User from token: {user}")
+        if user is None:
+            logger.info("User not authenticated, redirecting to login")
+            return redirect_to_login()
+
+        logger.info("Successfully rendered add-todo page")
+        return templates.TemplateResponse(request, "add-todo.html", {"user": user})
+
+    except:
+        logger.error("Error rendering add-todo page", exc_info=True)
         return redirect_to_login()
 
 
