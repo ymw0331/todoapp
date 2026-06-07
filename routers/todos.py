@@ -6,7 +6,10 @@ from models import Todos
 from database import SessionLocal
 from routers.auth import get_current_user
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/todos",
+    tags=["todos"],
+)
 
 
 # yields a DB session per request, and closes it when the request is done
