@@ -148,6 +148,7 @@ if (loginForm) {
             if (response.ok) {
                 // Handle success (e.g., redirect to dashboard)
                 const data = await response.json();
+                console.log(data);
                 // Delete any cookies available
                 logout();
                 // Save token to cookie

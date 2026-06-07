@@ -58,7 +58,7 @@ async def render_todo_page(request: Request, db: db_dependency):
             request, "todo.html", {"todos": todos, "user": user}
         )
 
-    except Exception as e:
+    except:
         return redirect_to_login()
 
 
@@ -105,6 +105,7 @@ async def render_edit_todo_page(request: Request, todo_id: int, db: db_dependenc
     except:
         logger.error("Error rendering edit-todo page", exc_info=True)
         return redirect_to_login()
+
 
 
 ### Endpoints ###
