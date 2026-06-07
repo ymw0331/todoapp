@@ -1,39 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
+{%include "layout.html" %}
 
-<head>
-    <link rel="stylesheet" href="{{url_for('static', path='/css/base.css')}}">
-    <link rel="stylesheet" href="{{url_for('static', path='/css/bootstrap.css')}}">
-    <meta charset="UTF-8">
-    <title>TodoApp</title>
-</head>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            Login
+        </div>
+        <div class="card-body">
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
 
-<body>
-    <div class="container">
-        <div class="card">
-            <div class="card-header">
-                Login
-            </div>
-            <div class="card-body">
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label>Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                    </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
 
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">Login</button>
-                </form>
-            </div>
-            <div class="card-footer text-muted">
-                <a href="/auth/register-page">Don't have an account? Register here.</a>
-            </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+        <div class="card-footer text-muted">
+            <a href="/auth/register-page">Don't have an account? Register here.</a>
         </div>
     </div>
-</body>
-
-</html>
+</div>
