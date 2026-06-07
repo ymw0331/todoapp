@@ -1,10 +1,15 @@
 from typing import Annotated
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
-from fastapi import APIRouter, Depends, HTTPException, Path, status
+from fastapi import APIRouter, Depends, HTTPException, Path, Request, status
 from models import Todos
 from database import SessionLocal
 from routers.auth import get_current_user
+from fastapi.templating import Jinja2Templates
+from starlette.responses import RedirectResponse
+
+
+templates = Jinja2Templates(directory="templates")
 
 router = APIRouter(
     prefix="/todos",
@@ -24,6 +29,37 @@ def get_db():
 # Depends: injects get_db() into each route so we don't manually manage the session
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
+
+
+def redirect_to_login():
+    redirect_response = RedirectResponse(
+        url="/auth/login-page", status_code=status.HTTP_302_FOUND
+    )
+    redirect_response.delete_cookie(key="access_token")  # clear invalid/expired token
+    return redirect_response
+
+
+### Pages ###
+# pass in all todos that belong to the user, so we can render them in the template
+@router.get("/todo-page")
+async def render_todo_page(request: Request, db: db_dependency):
+    try:
+        user = await get_current_user(request.cookies.get("access_token"))
+
+        if user is None:
+            return redirect_to_login()
+
+        todos = db.query(Todos).filter(Todos.owner_id == user.get("id")).all()
+
+        return templates.TemplateResponse(
+            request, "todo.html", {"todos": todos, "user": user}
+        )
+
+    except Exception as e:
+        return redirect_to_login()
+
+
+### Endpoints ###
 
 
 # Pydantic model: validates and parses the request body for create/update endpoints
@@ -126,5 +162,7 @@ async def delete_todo(
     )
     if todo_model is None:
         raise HTTPException(status_code=404, detail="Todo not found")
-    db.query(Todos).filter(Todos.id == todo_id).filter(Todos.owner_id == user.get("id")).delete()
+    db.query(Todos).filter(Todos.id == todo_id).filter(
+        Todos.owner_id == user.get("id")
+    ).delete()
     db.commit()
