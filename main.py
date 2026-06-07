@@ -1,12 +1,21 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 import models
 from database import engine
 from routers import auth, todos, admin, user
+from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
 
 # creates all tables in the DB based on models.py (runs once on startup)
 models.Base.metadata.create_all(bind=engine)
+
+templates = Jinja2Templates(directory="templates")
+
+
+@app.get("/")
+def test(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request})
+
 
 app.include_router(auth.router)
 app.include_router(todos.router)

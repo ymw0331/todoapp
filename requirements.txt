@@ -5,3 +5,5 @@ passlib[bcrypt]
 python-jose[cryptography]
 python-multipart
 alembic
+aiofiles
+jinja2
